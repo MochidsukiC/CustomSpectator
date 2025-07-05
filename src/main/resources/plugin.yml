@@ -1,0 +1,13 @@
+name: CustomSpectator
+version: '1.0-SNAPSHOT'
+main: jp.houlab.mochidsuki.customSpectator.Main
+api-version: '1.20'
+
+
+commands:
+  customspectate:
+    aliases: [cp]
+    description: BRC管理コマンド
+    permission: customspectate.command.customspectate
+    permission-message: Permission denied
+    usage: gr reload
