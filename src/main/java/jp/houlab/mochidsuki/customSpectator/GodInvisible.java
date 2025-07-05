@@ -39,50 +39,6 @@ public class GodInvisible {
         } else {
             godInvisiblePlayerList.remove(player.getUniqueId());
 
-            // --- showPlayerの代わりとなる手動パケット送信処理 ---
-            // 1. PlayerInfoリストに「追加」するパケットを作成
-            PacketContainer playerInfoAddPacket = protocolManager.createPacket(PacketType.Play.Server.PLAYER_INFO);
-
-            // ★★★ クラッシュ修正点 ★★★
-            // ProtocolLib 5.3.0 の高レベルラッパーが 1.20.4 のパケット構造と合わず ClassCastException を引き起こすため、
-            // 低レベルな方法で直接パケットに書き込む。
-            // サーバー(1.20.4)が期待する ArrayList<Enum> を作成する。
-            List<Object> rawActions = new ArrayList<>();
-            // コンバーターを使ってラッパーEnumをNMSのEnumインスタンスに変換する
-            rawActions.add(EnumWrappers.PLAYER_INFO_ACTION.getGeneric(EnumWrappers.PlayerInfoAction.ADD_PLAYER));
-            rawActions.add(EnumWrappers.PLAYER_INFO_ACTION.getGeneric(EnumWrappers.PlayerInfoAction.UPDATE_LISTED));
-            // getModifier() を使って、型を気にせず直接リストを書き込む
-            playerInfoAddPacket.getModifier().write(0, rawActions);
-
-
-            // PlayerInfoDataの作成
-            PlayerInfoData playerInfoData = new PlayerInfoData(
-                    WrappedGameProfile.fromPlayer(player),
-                    player.getPing(),
-                    EnumWrappers.NativeGameMode.fromBukkit(player.getGameMode()),
-                    null, // displayName - nullでクライアント側で解決させるのが安全
-                    null  // chatSession
-            );
-            playerInfoAddPacket.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
-
-            // 2. プレイヤーをワールドに「スポーン」させるパケットを作成
-            PacketContainer spawnPacket = protocolManager.createPacket(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
-            // エンティティID
-            spawnPacket.getIntegers().write(0, player.getEntityId());
-            // UUID
-            spawnPacket.getUUIDs().write(0, player.getUniqueId());
-            // 座標
-            spawnPacket.getDoubles()
-                    .write(0, player.getLocation().getX())
-                    .write(1, player.getLocation().getY())
-                    .write(2, player.getLocation().getZ());
-            // 角度
-            spawnPacket.getBytes()
-                    .write(0, (byte) (player.getLocation().getYaw() * 256.0F / 360.0F))
-                    .write(1, (byte) (player.getLocation().getPitch() * 256.0F / 360.0F));
-
-            // 3. サーバー上の全プレイヤーに上記パケットを送信
-            broadcastPackets(player, protocolManager, playerInfoAddPacket, spawnPacket);
         }
     }
 
