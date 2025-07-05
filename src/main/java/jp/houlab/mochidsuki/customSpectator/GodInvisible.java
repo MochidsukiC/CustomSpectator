@@ -9,11 +9,7 @@ import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static jp.houlab.mochidsuki.customSpectator.Main.getProtocolManager;
 
@@ -44,22 +40,29 @@ public class GodInvisible {
             godInvisiblePlayerList.remove(player.getUniqueId());
 
             // --- showPlayerの代わりとなる手動パケット送信処理 ---
-
             // 1. PlayerInfoリストに「追加」するパケットを作成
             PacketContainer playerInfoAddPacket = protocolManager.createPacket(PacketType.Play.Server.PLAYER_INFO);
-            playerInfoAddPacket.getPlayerInfoActions().write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER, EnumWrappers.PlayerInfoAction.UPDATE_LISTED));
 
-            // ★修正点★ 現在のバージョンに合った正しいコンストラクタを使用
+            // ★★★ クラッシュ修正点 ★★★
+            // ProtocolLib 5.3.0 の高レベルラッパーが 1.20.4 のパケット構造と合わず ClassCastException を引き起こすため、
+            // 低レベルな方法で直接パケットに書き込む。
+            // サーバー(1.20.4)が期待する ArrayList<Enum> を作成する。
+            List<Object> rawActions = new ArrayList<>();
+            // コンバーターを使ってラッパーEnumをNMSのEnumインスタンスに変換する
+            rawActions.add(EnumWrappers.PLAYER_INFO_ACTION.getGeneric(EnumWrappers.PlayerInfoAction.ADD_PLAYER));
+            rawActions.add(EnumWrappers.PLAYER_INFO_ACTION.getGeneric(EnumWrappers.PlayerInfoAction.UPDATE_LISTED));
+            // getModifier() を使って、型を気にせず直接リストを書き込む
+            playerInfoAddPacket.getModifier().write(0, rawActions);
+
+
+            // PlayerInfoDataの作成
             PlayerInfoData playerInfoData = new PlayerInfoData(
                     WrappedGameProfile.fromPlayer(player),
                     player.getPing(),
-                    // isListed引数を削除
                     EnumWrappers.NativeGameMode.fromBukkit(player.getGameMode()),
                     null, // displayName - nullでクライアント側で解決させるのが安全
                     null  // chatSession
             );
-
-            // ★修正点★ 正しいインデックス(0)を使用
             playerInfoAddPacket.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
 
             // 2. プレイヤーをワールドに「スポーン」させるパケットを作成
