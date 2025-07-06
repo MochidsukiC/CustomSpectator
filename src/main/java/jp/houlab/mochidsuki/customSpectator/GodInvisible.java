@@ -63,6 +63,11 @@ public class GodInvisible {
                     otherPlayer.showPlayer(plugin, player);
                 }
             }
+            for(UUID godPlayerUUID : GodMode.getGodModePlayerSet()){
+                if(Bukkit.getOfflinePlayer(godPlayerUUID).isOnline()) {
+                    player.hidePlayer(plugin,Bukkit.getPlayer(godPlayerUUID));
+                }
+            }
         }
     }
 

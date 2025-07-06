@@ -10,7 +10,7 @@ public class CommandListener implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         if(command.getName().equalsIgnoreCase("customspectate")){
-            GodMode.setGodMode((Player) commandSender,GodMode.isGodMode((Player) commandSender));
+            GodMode.setGodMode((Player) commandSender,!GodMode.isGodMode((Player) commandSender));
         }
         return false;
     }

@@ -1,5 +1,6 @@
 package jp.houlab.mochidsuki.customSpectator;
 
+import jp.houlab.mochidsuki.hPDisplay.headDisplay.HeadDisplayMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -10,28 +11,40 @@ import static jp.houlab.mochidsuki.customSpectator.Main.plugin;
 
 public class GodMode {
     private static final HashSet<UUID> GodModePlayerSet = new HashSet<>();
-    public static void setGodMode(Player player, boolean godMode) {
-        GodInvisible.setInvisible(player,godMode);
 
-        if(plugin.getServer().getPluginManager().isPluginEnabled("GameMap")) {
+    public static HashSet<UUID> getGodModePlayerSet(){
+        return GodModePlayerSet;
+    }
+    public static void setGodMode(Player player, boolean godMode) {
+        GodInvisible.setInvisible(player, godMode);
+
+        if (plugin.getServer().getPluginManager().isPluginEnabled("GameMap")) {
             jp.houlab.mochidsuki.gamemap.Main.setEnemyVisible(player, godMode);
         }
 
-            if(godMode){
+        if (godMode) {
             GodModePlayerSet.add(player.getUniqueId());
-            if(plugin.getServer().getPluginManager().isPluginEnabled("Pin")) {
-                for (Player other : Bukkit.getOnlinePlayers()) {
-                    jp.houlab.mochidsuki.pin.V.addGlowing(player, other);
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                if (!player.getUniqueId().equals(other.getUniqueId())) {
+                    if (plugin.getServer().getPluginManager().isPluginEnabled("Pin")) {
+                        jp.houlab.mochidsuki.pin.Utilities.addGlowing(player, other);
+                    }
+                    if(plugin.getServer().getPluginManager().isPluginEnabled("HPDisplay")){
+                        HeadDisplayMain.PLAYER_HEAD_DISPLAY_MAP.get(other.getUniqueId()).addShowPlayer(player);
+                    }
                 }
             }
-        }else {
+
+        } else {
             GodModePlayerSet.remove(player.getUniqueId());
 
-            if(plugin.getServer().getPluginManager().isPluginEnabled("Pin")) {
-                for (Player other : Bukkit.getOnlinePlayers()) {
-                    if ((player.getScoreboard().getPlayerTeam(player) == null || !player.getScoreboard().getPlayerTeam(player).getEntries().contains(other.getName()))) {
-                        jp.houlab.mochidsuki.pin.V.removeGlowing(player, other);
-                    }
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                if (plugin.getServer().getPluginManager().isPluginEnabled("Pin")) {
+                    jp.houlab.mochidsuki.pin.Utilities.removeGlowing(player, other);
+                }
+                if (plugin.getServer().getPluginManager().isPluginEnabled("HPDisplay")) {
+                    HeadDisplayMain.PLAYER_HEAD_DISPLAY_MAP.get(other.getUniqueId()).addHidePlayer(player);
+
                 }
             }
         }
