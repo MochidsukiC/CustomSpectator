@@ -34,7 +34,10 @@ public final class Main extends JavaPlugin {
 
         plugin =this;
 
-         protocolManager = ProtocolLibrary.getProtocolManager();
+        protocolManager = ProtocolLibrary.getProtocolManager();
+
+
+        /*
 
         // --- ここにプレイヤーを隠すコマンドなどを実装 ---
         // 例: hiddenPlayers.add(playerToHide.getUniqueId());
@@ -112,6 +115,8 @@ public final class Main extends JavaPlugin {
                 }
             }
         });
+
+         */
     }
 
     @Override

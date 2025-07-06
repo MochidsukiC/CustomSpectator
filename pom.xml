@@ -78,5 +78,17 @@
             <version>5.3.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>jp.houlab.mochidsuki</groupId>
+            <artifactId>pin</artifactId>
+            <version>2.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jp.houlab.mochidsuki</groupId>
+            <artifactId>gamemap</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

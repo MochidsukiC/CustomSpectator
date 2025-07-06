@@ -8,10 +8,13 @@ import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
 import static jp.houlab.mochidsuki.customSpectator.Main.getProtocolManager;
+import static jp.houlab.mochidsuki.customSpectator.Main.plugin;
 
 public class GodInvisible {
     // プレイヤー名(String)ではなく、不変のUUIDで管理する
@@ -19,12 +22,27 @@ public class GodInvisible {
 
     public static void setInvisible(Player player, boolean invisible) {
         // ProtocolManagerのインスタンスをメソッドの最初で一度だけ取得する
-        ProtocolManager protocolManager = getProtocolManager();
+        //ProtocolManager protocolManager = getProtocolManager();
 
         if (invisible) {
+            //不可視になる
+            //不可視リストに追加
             godInvisiblePlayerList.add(player.getUniqueId());
+            //全プレイヤーに不可視になったことを伝達
+            for(Player otherPlayer : Bukkit.getOnlinePlayers()){
+                //自分からは全員可視にする
+                player.showPlayer(plugin,otherPlayer);
 
-            // ★修正点★ 安全なパケット生成方法に変更
+                if(!otherPlayer.getUniqueId().equals(player.getUniqueId()) && !GodInvisible.isInvisible(otherPlayer)) {
+                    //可視プレイヤーから見えなくする
+                    otherPlayer.hidePlayer(plugin, player);
+                }else {
+                    //不可視プレイヤーから見えるようにする
+                    otherPlayer.showPlayer(plugin,player);
+                }
+            }
+
+            /*
             // 1. エンティティ破壊パケットを作成
             PacketContainer destroyEntityPacket = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
             destroyEntityPacket.getIntLists().write(0, List.of(player.getEntityId()));
@@ -36,9 +54,15 @@ public class GodInvisible {
             // サーバー上の全プレイヤーにパケットを送信
             broadcastPackets(player, protocolManager, destroyEntityPacket, playerInfoRemovePacket);
 
+             */
         } else {
             godInvisiblePlayerList.remove(player.getUniqueId());
 
+            for(Player otherPlayer : Bukkit.getOnlinePlayers()){
+                if(!otherPlayer.getUniqueId().equals(player.getUniqueId())) {
+                    otherPlayer.showPlayer(plugin, player);
+                }
+            }
         }
     }
 
