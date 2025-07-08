@@ -1,15 +1,7 @@
 package jp.houlab.mochidsuki.customSpectator;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.PlayerInfoData;
-import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -71,6 +63,7 @@ public class GodInvisible {
         }
     }
 
+    /*
     // パケットをブロードキャストするためのヘルパーメソッド
     private static void broadcastPackets(Player subject, ProtocolManager manager, PacketContainer... packets) {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -85,6 +78,8 @@ public class GodInvisible {
             }
         }
     }
+
+     */
 
     // Playerオブジェクトで判定するバージョン
     public static boolean isInvisible(Player player) {
